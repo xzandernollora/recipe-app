@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:recipe_app/utils/constants.dart';
+import 'package:recipe_app/views/app_home_screen.dart';
 
 class AppMainScreen extends StatefulWidget {
   const AppMainScreen({super.key});
@@ -11,6 +12,18 @@ class AppMainScreen extends StatefulWidget {
 
 class _AppMainScreenState extends State<AppMainScreen> {
   int selectedIndex = 0;
+
+  late final List<Widget> pages;
+  @override
+  void initState() {
+    pages = [
+      AppHomeScreen(),
+      navBarPage(Iconsax.heart5),
+      navBarPage(Iconsax.menu5),
+      navBarPage(Iconsax.setting_21),
+    ];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +49,7 @@ class _AppMainScreenState extends State<AppMainScreen> {
         },
         items: [
           BottomNavigationBarItem(
-            icon: Icon(selectedIndex == 0 ? Iconsax.home5 : Iconsax.home1),
+            icon: Icon(selectedIndex == 0 ? Iconsax.home5 : Iconsax.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
@@ -54,6 +67,17 @@ class _AppMainScreenState extends State<AppMainScreen> {
             label: 'Settings',
           ),
         ],
+      ),
+      body: pages[selectedIndex],
+    );
+  }
+
+  navBarPage(iconName) {
+    return Center(
+      child: Icon(
+        iconName,
+        size: 100,
+        color: selectedIndex == 0 ? primarycolor : Colors.grey,
       ),
     );
   }
