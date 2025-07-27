@@ -5,6 +5,7 @@ import 'package:recipe_app/utils/constants.dart';
 import 'package:recipe_app/widget/banner.dart';
 import 'package:recipe_app/widget/food_items_display.dart';
 import 'package:recipe_app/widget/icon_button.dart';
+import 'package:recipe_app/views/view_all_items.dart';
 
 class AppHomeScreen extends StatefulWidget {
   const AppHomeScreen({super.key});
@@ -34,6 +35,7 @@ class _AppHomeScreen extends State<AppHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Column(
@@ -67,7 +69,12 @@ class _AppHomeScreen extends State<AppHomeScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            //making functionality later
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ViewAllItems(),
+                              ),
+                            );
                           },
                           child: Text(
                             "View All",
@@ -91,6 +98,7 @@ class _AppHomeScreen extends State<AppHomeScreen> {
                     return Padding(
                       padding: EdgeInsetsGeometry.only(top: 5, left: 15),
                       child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
                         child: Row(
                           children: recipes
                               .map((e) => FoodItemsDisplay(documentSnapshot: e))

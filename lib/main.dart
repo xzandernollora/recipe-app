@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:recipe_app/views/app_main.dart';
+import 'package:recipe_app/provider/favorite.provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,9 +15,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AppMainScreen(),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => FavoriteProvider())],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: AppMainScreen(),
+      ),
     );
   }
 }
