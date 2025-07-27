@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
 import 'package:recipe_app/provider/favorite.provider.dart';
+import 'package:recipe_app/provider/quantity.dart';
 import 'package:recipe_app/utils/constants.dart';
 import 'package:recipe_app/widget/icon_button.dart';
+import 'package:recipe_app/widget/quantity_increment_decrement.dart';
+import 'package:recipe_app/provider/quantity.dart';
 
 class RecipeDetailsScreen extends StatefulWidget {
   final DocumentSnapshot<Object?> documentSnapshot;
@@ -15,8 +19,23 @@ class RecipeDetailsScreen extends StatefulWidget {
 
 class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
   @override
+  void initState() {
+    List<double> baseAmounts = widget.documentSnapshot['ingredientsAmount']
+        .map<double>((amount) => double.parse(amount.toString()))
+        .toList();
+
+    Provider.of<QuantityProvider>(
+      context,
+      listen: false,
+    ).setBaseIngredientsAmount(baseAmounts);
+    super.initState();
+    // Initialize any necessary data or state here
+  }
+
   Widget build(BuildContext context) {
     final provider = FavoriteProvider.of(context);
+    final quantityProvider = Provider.of<QuantityProvider>(context);
+
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: startCookingAndFavoriteButton(provider),
@@ -91,6 +110,7 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
             Padding(
               padding: EdgeInsetsGeometry.symmetric(horizontal: 20),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.documentSnapshot["name"],
@@ -144,6 +164,108 @@ class _RecipeDetailsScreenState extends State<RecipeDetailsScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Ingredients",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            "How many servings?",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      QuantityIncrementDecrement(
+                        currentNumber: quantityProvider.currentNumber,
+                        onAdd: () => quantityProvider.increaseQuantity(),
+                        onRemove: () => quantityProvider.decreaseQuantity(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Column(
+                            children: [
+                              ...widget.documentSnapshot['ingredientsImage']
+                                  .map<Widget>(
+                                    (imageUrl) => Container(
+                                      height: 55,
+                                      width: 55,
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        image: DecorationImage(
+                                          image: NetworkImage(imageUrl),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ],
+                          ),
+                          SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ...widget.documentSnapshot['ingredientsName']
+                                  .map<Widget>(
+                                    (ingredient) => SizedBox(
+                                      height: 60,
+                                      child: Text(
+                                        ingredient,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ],
+                          ),
+                          Spacer(),
+                          Column(
+                            children: quantityProvider.updateIngredientsAmount
+                                .map<Widget>(
+                                  (amount) => SizedBox(
+                                    height: 60,
+                                    child: Text(
+                                      " ${amount}gm",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 40),
                 ],
               ),
             ),
